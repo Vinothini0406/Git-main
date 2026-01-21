@@ -71,9 +71,14 @@ export function AppSidebar(){
                     return (
                         <SidebarMenuItem key = {item.title}>
                             <SidebarMenuButton asChild>
-                                <Link href={item.url} className={cn({
-                                    '|bg-primary !text-white': pathname === item.url
+                                {/* <Link href={item.url} className={cn({
+                                    '|bg-primary text-white': pathname === item.url
                                 },'list-none')}>
+                                 */}
+                                 <Link href={item.url} className={cn({
+    'bg-muted text-black font-medium': pathname === item.url
+}, 'list-none')}>
+
                                     <item.icon/>
                                     <span>{item.title}</span>
                                 </Link>
@@ -96,7 +101,7 @@ export function AppSidebar(){
                                 <SidebarMenuButton asChild>
                                     <div>
                                         <div className={cn (
-                                            'rounded-sm boredr size-6 flex items-center justify-center text-sm bg-white text-primary',
+                                            'rounded-sm border size-6 flex items-center justify-center text-sm bg-white text-primary',
                                             {
                                                 'bg-primary text-white' : true
                                             }
