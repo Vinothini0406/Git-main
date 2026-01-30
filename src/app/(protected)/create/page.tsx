@@ -18,7 +18,6 @@ const CreatePage = () => {
     const createProject = api.project.createProject.useMutation()
 
     function onSubmit(data: FormInput) {
-        window.alert(JSON.stringify(data, null, 2))
         createProject.mutate({
             githubUrl: data.repoUrl,
             name: data.projectName,
