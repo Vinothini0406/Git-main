@@ -126,7 +126,14 @@ export const getCommitHashes = async (
 }
 
 export const pollCommits = async (projectId: string) => {
-  const {project,githubUrl } = await fetchProjectGithubUrl(projectId)
+  const githubUrlData = await fetchProjectGithubUrl(projectId)
+  
+  // Skip processing if project doesn't have a GitHub URL
+  if (!githubUrlData?.githubUrl) {
+    return []
+  }
+  
+  const { githubUrl } = githubUrlData
   const commitHashes = await getCommitHashes(githubUrl)
   const unprocessedCommits = await filterUnprocessedCommits(projectId, commitHashes)
   const summaryResponses = await Promise.allSettled(unprocessedCommits.map(commit=>{
@@ -170,11 +177,12 @@ async function fetchProjectGithubUrl(projectId: string) {
     select: { githubUrl: true },
   })
 
+  // Return null if project or GitHub URL is missing
   if (!project?.githubUrl) {
-    throw new Error("Project has no GitHub URL")
+    return null
   }
 
-  return { project, githubUrl: project?.githubUrl }
+  return { project, githubUrl: project.githubUrl }
 }
 
 async function filterUnprocessedCommits(
@@ -194,5 +202,3 @@ async function filterUnprocessedCommits(
       )
   )
 }
-
-await pollCommits("cml26412p0000j7a4zjesjc4z").then(console.log)
