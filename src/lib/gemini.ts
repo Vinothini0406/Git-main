@@ -1,5 +1,6 @@
-import  "dotenv/config";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Document } from "@langchain/core/documents";
+import "dotenv/config";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 const model = genAI.getGenerativeModel({
@@ -59,6 +60,46 @@ Do not include parts of the example in your summary.
 It is given only as example of appropriate comments.`,
      `Please summarize the following diff file: \n\n${diff}`,
 
-    ])
+    ]);
     return response.response.text()
 }
+
+export async function summariseCode(doc: Document) {
+  console.log('getting summary for', doc.metadata.source);
+  try{
+  const code = doc.pageContent.slice(0, 10000); // Limit to 10000 characters
+
+  const response = await model.generateContent([
+    `You are an intelligent senior software engineer who specialises in onboarding junior software engineers onto projects`,
+`You are onboarding a junior software engineer and explaining to them the purpose of the ${doc.metadata.source} file.
+
+Here is the code:
+---
+${code}
+---
+
+Give a summary no more than 100 words of the code above.`,
+  ]);
+
+  return response.response.text()
+}
+ catch(error){
+  console.error(`Failed to summarize ${doc.metadata.source}:`, error)
+  return ''
+ }
+}
+export async function generateEmbedding(summary: string) {
+  // Skip empty summaries to prevent API errors
+  if (!summary || summary.trim().length === 0) {
+    console.warn('Skipping embedding generation for empty summary')
+    return null
+  }
+  
+  const model = genAI.getGenerativeModel({
+    model : "gemini-embedding-001"
+  })
+  const result = await model.embedContent(summary)
+  const embedding = result.embedding
+  return embedding.values
+}
+

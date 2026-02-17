@@ -197,7 +197,7 @@ async function filterUnprocessedCommits(
   return commits.filter(
     (commit) =>
       !processed.some(
-        (processedCommit) =>
+        (processedCommit: { commitHash: string }) =>
           processedCommit.commitHash === commit.commitHash
       )
   )
